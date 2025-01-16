@@ -24,8 +24,9 @@ ui <- fluidPage(
     ),
     
     mainPanel(
+      uiOutput("area_tag"),
       div(id = "animated-text", "", style = 'margin-left:25px;'),
-      actionButton("show_answer", "Show Answer", style = "display: none; margin-left:25px;margin-top:10px;"), # Button initially hidden
+      actionButton("show_answer", "Show Answer", style = "display: none; margin-left:25px;margin-top:25px;"), # Button initially hidden
       div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;')
     )
   )
@@ -36,8 +37,10 @@ server <- function(input, output, session) {
   test_num_of_questions <- 10
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
+  show_tags <- reactiveValues(status='none')
   next_question <- reactiveValues(num=1)
   num_questions_asked <- reactiveValues(num=0)
+  question_counter <- reactiveValues(val=0)
   quiz_score <- reactiveValues(val=0)
   question_nums <- reactiveValues(selected=NA)
   
@@ -68,6 +71,8 @@ server <- function(input, output, session) {
     latest_answer$ans <- '' 
     session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_buttons$status <- 'none'
+    show_tags$status <- 'inline-block'
+    question_counter$val <- question_counter$val + 1
   })
   
   observeEvent(input$show_answer, {
@@ -118,7 +123,19 @@ server <- function(input, output, session) {
       div(style = paste0("width:", left, "%; height:25px;display: inline-block; margin-top:10px; margin-left:-3px;background-color: lightgrey;opacity: 0.2;background: repeating-linear-gradient( -45deg, grey, darkgrey, 1px, gold 2px, #e5e5f7 7px );"))
     )
   })
-
+  
+  output$area_tag <- renderUI({
+    out_area <- quiz_data()$area[question_nums$selected[question_counter$val]]
+    out_topic <- quiz_data()$topic[question_nums$selected[question_counter$val]]
+    div(
+      div(out_area, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
+                                margin-left:25px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
+                                opacity: 0.4;border-radius:4px;")),
+      div(out_topic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
+                              margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:silver;
+                              opacity: 0.4;border-radius:4px;"))
+    )
+  })
 
 }
 

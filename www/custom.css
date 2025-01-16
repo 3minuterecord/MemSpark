@@ -14,6 +14,20 @@
   background-color: red; 
 }
 
+.tag-tile {
+  background-color: gold; 
+  color:white;
+  margin-left:1px;
+  margin-bottom:1px;
+  margin-top:1px;
+  border-radius:2px;
+  width:9px;
+  height:9px;
+  vertical-align:top;
+  display:inline-block;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
+}
+
 .select { 
   max-width: 400px;
 }
