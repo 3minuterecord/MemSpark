@@ -8,8 +8,14 @@ ui <- fluidPage(
   ),
   tags$style(rel = "stylesheet", type = "text/css", href = "custom.css"),
   theme = shinytheme("cyborg"),
-  div(titlePanel("Quiz Me"), style = "margin-left:20px;margin-top:30px; font-weight:800;"),
-  
+  div(titlePanel(
+    tagList(
+      icon("lightbulb", style = "color:white;margin-left:15px;margin-top:15px;"), 
+      span("MemSpark", style = "color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
+      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;"),
+      div("Sharpen, Spark, Succeed.", style = "color:gold;margin-left:15px;margin-top:10px;font-size: 14px;font-weight: 200;")
+    ), windowTitle = "Quiz Me"
+  )),
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
@@ -26,7 +32,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 4
+  test_num_of_questions <- 10
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   next_question <- reactiveValues(num=1)
