@@ -19,7 +19,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
-      div(actionButton("new_question", "New Question"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px; margin-left:10px; color: white"))
+      div(actionButton("new_question", "New Question"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;"))
     ),
     
     mainPanel(
