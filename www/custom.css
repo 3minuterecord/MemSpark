@@ -14,6 +14,17 @@
   background-color: red; 
 }
 
+.select { 
+  max-width: 400px;
+}
+
+.span4 { 
+  max-width: 400px; 
+}
+
+.well { 
+  max-width: 400px; 
+}
 
 .selectize-input {
   font-size: 14px !important;

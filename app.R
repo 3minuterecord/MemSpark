@@ -19,7 +19,8 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
-      div(actionButton("new_question", "New Question"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;"))
+      div(actionButton("new_question", "New Question"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
+      uiOutput("progress_bar")
     ),
     
     mainPanel(
@@ -65,7 +66,7 @@ server <- function(input, output, session) {
     data <- quiz_data() %>% filter(topic == topic)
     question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
-    session$sendCustomMessage("animateText", list(text = question, speed = 50)) 
+    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_buttons$status <- 'none'
   })
   
@@ -108,6 +109,17 @@ server <- function(input, output, session) {
     }
     div(paste0(score, '%'))
   })
+  
+  output$progress_bar <- renderUI({
+    done = round(100 * (num_questions_asked$num / test_num_of_questions), 0)
+    left = 99 - done
+    div(
+      div(style = paste0("width:", done, "%; height:25px;display: inline-block; margin-top:10px; margin-right:0px;background-color: green;")),
+      div(style = paste0("width:", left, "%; height:25px;display: inline-block; margin-top:10px; margin-left:-3px;background-color: lightgrey;opacity: 0.2;background: repeating-linear-gradient( -45deg, grey, darkgrey, 1px, gold 2px, #e5e5f7 7px );"))
+    )
+  })
+
+
 }
 
 jsCode <- "
@@ -128,7 +140,7 @@ Shiny.addCustomMessageHandler('animateText', function(data) {
     } else {
       setTimeout(() => {
         answerBtn.style.display = 'inline-block'; // Show the button after delay
-      }, 1000); // 2-second delay
+      }, 800); // 2-second delay
     }
   }
   
