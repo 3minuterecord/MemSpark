@@ -1,8 +1,10 @@
 library(shiny)
 library(shinythemes)
 library(dplyr)
+library(shinyjs)
 
 ui <- fluidPage(
+  useShinyjs(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
   ),
@@ -19,14 +21,14 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
-      div(actionButton("new_question", "New Question"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
+      div(actionButton("new_question", "New Test"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
       uiOutput("progress_bar")
     ),
     
     mainPanel(
       uiOutput("area_tag"),
       div(id = "animated-text", "", style = 'margin-left:25px;'),
-      actionButton("show_answer", "Show Answer", style = "display: none; margin-left:25px;margin-top:25px;"), # Button initially hidden
+      uiOutput("show_answer_btn"),
       div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;')
     )
   )
@@ -37,6 +39,9 @@ server <- function(input, output, session) {
   test_num_of_questions <- 10
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
+  show_ask_next_button <- reactiveValues(status='none')
+  show_ans_button <- reactiveValues(status='none')
+  show_ans_icon <- reactiveValues(status='none')
   show_tags <- reactiveValues(status='none')
   next_question <- reactiveValues(num=1)
   num_questions_asked <- reactiveValues(num=0)
@@ -46,17 +51,17 @@ server <- function(input, output, session) {
   
   quiz_data <- reactive({
     data <- suppressWarnings(read.csv("data/knowledgebase.csv", stringsAsFactors = FALSE))
-    return(data)
+    shuffled_data <- data[sample(nrow(data)), ]
+    return(shuffled_data)
   })
   
   output$topic_selector <- renderUI({
-    div(selectInput("num", "Select Topic:", choices = sort(unique(quiz_data()$area))))
+    div(selectInput("num", "Select Topic:", choices = c("Mix", sort(unique(quiz_data()$area)))))
   })
   
   
   observe({
-    topic <- 'Area'
-    data <- quiz_data() %>% filter(topic == topic)
+    data <- quiz_data()
     total_num_of_questions = length(data$question)
     #set.seed(123)
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
@@ -70,34 +75,56 @@ server <- function(input, output, session) {
     question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
     session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
+    show_ask_next_button$status <- 'none'
+    show_tags$status <- 'inline-block'
+    question_counter$val <- question_counter$val + 1
+  })
+  
+  observeEvent(input$ask_new_question, {
+    question <- quiz_data()$question[question_nums$selected[next_question$num]]
+    latest_answer$ans <- '' 
+    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_buttons$status <- 'none'
     show_tags$status <- 'inline-block'
+    show_ask_next_button$status <- 'none'
+    show_ans_icon$status <- 'none'
     question_counter$val <- question_counter$val + 1
   })
   
   observeEvent(input$show_answer, {
     data <- quiz_data()
     latest_answer$ans <- data$answer[question_nums$selected[next_question$num]]
+    show_ans_button$status <- 'none !important'
     show_buttons$status <- 'inline-block'
+    show_ans_icon$status <- 'inline-block'
     if (next_question$num < test_num_of_questions){
       next_question$num <- next_question$num + 1
     }
   })
   
   observeEvent(input$show_yes, {
+    show_buttons$status <- 'none'
     quiz_score$val <- quiz_score$val + 1
     num_questions_asked$num <- num_questions_asked$num + 1
+    show_ask_next_button$status <- 'inline-block'
   })
   
   observeEvent(input$show_no, {
+    show_buttons$status <- 'none'
     num_questions_asked$num <- num_questions_asked$num + 1
+    show_ask_next_button$status <- 'inline-block'
+  })
+  
+  output$show_answer_btn <- renderUI({
+    actionButton("show_answer", "Show Answer", style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;"))
   })
   
   output$answer <- renderUI({
     div(
-      div(icon("check-circle", style = paste0("display: ", show_buttons$status, "; color: green; margin-right:5px;")), latest_answer$ans),
+      div(icon("check-circle", style = paste0("display: ", show_ans_icon$status, "; color: green; margin-right:5px;")), latest_answer$ans),
       div(actionButton("show_yes", "Correct", style = paste0("display: ", show_buttons$status, "; margin-left:0px;margin-top:25px;")), 
-          actionButton("show_no", "Wrong", style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")))
+          actionButton("show_no", "Wrong", style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
+          actionButton("ask_new_question", "Next Question", style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;color:black;")))
     )
   })
   
@@ -156,7 +183,7 @@ Shiny.addCustomMessageHandler('animateText', function(data) {
       setTimeout(typeWriter, data.speed);
     } else {
       setTimeout(() => {
-        answerBtn.style.display = 'inline-block'; // Show the button after delay
+      answerBtn.style.display = 'inline-block'; // Show the button after delay
       }, 800); // 2-second delay
     }
   }
