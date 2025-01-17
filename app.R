@@ -70,8 +70,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$new_question, {
-    topic <- 'Management'
-    data <- quiz_data() %>% filter(topic == topic)
+    data <- quiz_data()
     question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
     session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
@@ -92,6 +91,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$show_answer, {
+    session$sendCustomMessage("hideAnsAsk", list())
     data <- quiz_data()
     latest_answer$ans <- data$answer[question_nums$selected[next_question$num]]
     show_ans_button$status <- 'none !important'
@@ -189,6 +189,11 @@ Shiny.addCustomMessageHandler('animateText', function(data) {
   }
   
   typeWriter();
+});
+
+Shiny.addCustomMessageHandler('hideAnsAsk', function(data) {
+  let answerBtn = document.getElementById('show_answer');
+  answerBtn.style.display = 'none'; 
 });
 "
 
