@@ -61,3 +61,7 @@
 .selectize-dropdown .selected {
   background-color: grey !important; 
 } 
+
+@keyframes pulse {
+ 50% { opacity: 0; }
+}

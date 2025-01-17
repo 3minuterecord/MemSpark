@@ -21,7 +21,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
-      div(actionButton("new_question", "New Test"),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
+      div(actionButton("new_question", "New Test", icon = icon("rocket", style = "padding-right: 5px;")),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
       uiOutput("progress_bar")
     ),
     
@@ -103,6 +103,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$show_yes, {
+    session$sendCustomMessage("showClapping", list())
+    Sys.sleep(1)
     show_buttons$status <- 'none'
     quiz_score$val <- quiz_score$val + 1
     num_questions_asked$num <- num_questions_asked$num + 1
@@ -110,21 +112,25 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$show_no, {
+    session$sendCustomMessage("showSadFace", list())
+    Sys.sleep(1)
     show_buttons$status <- 'none'
     num_questions_asked$num <- num_questions_asked$num + 1
     show_ask_next_button$status <- 'inline-block'
   })
   
   output$show_answer_btn <- renderUI({
-    actionButton("show_answer", "Show Answer", style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;"))
+    actionButton("show_answer", "Show Answer", icon = icon("eye", style = "padding-right: 5px;"), style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;"))
   })
   
   output$answer <- renderUI({
     div(
       div(icon("check-circle", style = paste0("display: ", show_ans_icon$status, "; color: green; margin-right:5px;")), latest_answer$ans),
-      div(actionButton("show_yes", "Correct", style = paste0("display: ", show_buttons$status, "; margin-left:0px;margin-top:25px;")), 
-          actionButton("show_no", "Wrong", style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
-          actionButton("ask_new_question", "Next Question", style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;color:black;")))
+      div(actionButton("show_yes", "Correct", icon = icon("circle-check", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:0px;margin-top:25px;")), 
+          actionButton("show_no", "Wrong", icon = icon("circle-xmark", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
+          div(id = "sad_icon", icon("sad-cry", style = "font-size: 24px; color:red;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
+          div(id = "clap_icon", icon("hands-clapping", style = "font-size: 24px; color:green;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
+          actionButton("ask_new_question", "Next Question", icon = icon("forward", style = "padding-right: 4px;"), style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;opacity:0.5;color:black;")))
     )
   })
   
@@ -195,6 +201,23 @@ Shiny.addCustomMessageHandler('hideAnsAsk', function(data) {
   let answerBtn = document.getElementById('show_answer');
   answerBtn.style.display = 'none'; 
 });
+
+Shiny.addCustomMessageHandler('showSadFace', function(data) {
+  const sadIcon = document.getElementById('sad_icon');
+  sadIcon.style.display = 'inline-block'; // Show the icon
+  setTimeout(() => {
+    sadIcon.style.display = 'none'; // Hide the icon after 2 seconds
+  }, 4000);
+});
+
+Shiny.addCustomMessageHandler('showClapping', function(data) {
+  const sadIcon = document.getElementById('clap_icon');
+  sadIcon.style.display = 'inline-block'; // Show the icon
+  setTimeout(() => {
+    sadIcon.style.display = 'none'; // Hide the icon after 2 seconds
+  }, 4000);
+});
+
 "
 
 ui <- tagList(
