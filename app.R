@@ -168,13 +168,17 @@ server <- function(input, output, session) {
   output$area_tag <- renderUI({
     out_area <- quiz_data()$area[question_nums$selected[question_counter$val]]
     out_topic <- quiz_data()$topic[question_nums$selected[question_counter$val]]
+    out_subtopic <- quiz_data()$subtopic[question_nums$selected[question_counter$val]]
     div(
       div(out_area, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                                 margin-left:25px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
                                 opacity: 0.4;border-radius:4px;")),
       div(out_topic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                               margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:silver;
-                              opacity: 0.4;border-radius:4px;"))
+                              opacity: 0.45;border-radius:4px;")),
+      div(out_subtopic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
+                              margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:olive;
+                              opacity: 0.8;border-radius:4px;"))
     )
   })
 
