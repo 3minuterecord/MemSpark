@@ -43,7 +43,8 @@ Data Science,Data Mining,Rule of Thumb,What is a rule-of-thumb missing value % c
 Data Science,Data Mining,Rule of Thumb,Above what degree (%) of 'missingness' is imputation not advisable?,"Above 30%, imputation is not advisable. It should never be performed when 50% or more values for the feature are missing."
 Data Science,Data Mining,Feature Engineering,What is a negative of one-hot encoding for categorical features?,"It can lead to high dimensionality, possibly longer training times and/or underperformance. For implementation, consider map function in Python or SciKit learn's one-hot encoder function."
 Data Science,Data Mining,Data Preparation,Name three sampling strategies?,"1) Systematic, 2) Random, and 3) Stratified."
-Data Science,Data Mining,Modelling,What is 'bias' in modelling?,"Bias is error from eroneous or overly simplfied assumptions, e.g., modelling a complex real-life problem with a simple model. "
-Data Science,Data Mining,Modelling,What is 'variance' in modelling?,Error due to sensitivity to small fluctuations in the training dataset.
+Data Science,Data Mining,Modelling,What is 'bias' in modelling?,"Bias is error from eroneous or overly simplfied assumptions, e.g., modelling a complex real-life problem with a simple model. High bias can be characterised by underfitting. "
+Data Science,Data Mining,Modelling,What is 'variance' in modelling?,Error due to sensitivity to small fluctuations in the training dataset. High variance could be characterised as overfitting.
 Data Science,Data Mining,Model Evaluation,Name three methods of ML model evaluation?,"1) Hold-out dataset, 2) K-foldcross validation, and 3) Bootstrapping."
 Data Science,Data Mining,Model Evaluation,What is the irreducible error of an ML model?,It is the error that can't reduced by creating a 'better' model. It is a measure of the amount of noise in the dataset. You will always have noise or 'irredicible' error.
+Data Science,Data Mining,Modelling,What is the curse of dimensionality?,"When we spread observations of a dataset over a large number of observations, it can be difficult to find neighbours!"
