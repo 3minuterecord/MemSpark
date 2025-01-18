@@ -36,13 +36,14 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 10
+  test_num_of_questions <- 2
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   show_ask_next_button <- reactiveValues(status='none')
   show_ans_button <- reactiveValues(status='none')
   show_ans_icon <- reactiveValues(status='none')
   show_tags <- reactiveValues(status='none')
+  show_completion_flag <- reactiveValues(status='none')
   next_question <- reactiveValues(num=1)
   num_questions_asked <- reactiveValues(num=0)
   question_counter <- reactiveValues(val=0)
@@ -108,7 +109,12 @@ server <- function(input, output, session) {
     show_buttons$status <- 'none'
     quiz_score$val <- quiz_score$val + 1
     num_questions_asked$num <- num_questions_asked$num + 1
-    show_ask_next_button$status <- 'inline-block'
+    if (num_questions_asked$num == test_num_of_questions){
+      show_completion_flag$status <- 'inline-block'
+    } else {
+      show_ask_next_button$status <- 'inline-block'  
+    }
+    
   })
   
   observeEvent(input$show_no, {
@@ -130,7 +136,9 @@ server <- function(input, output, session) {
           actionButton("show_no", "Wrong", icon = icon("circle-xmark", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
           div(id = "sad_icon", icon("sad-cry", style = "font-size: 24px; color:red;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
           div(id = "clap_icon", icon("hands-clapping", style = "font-size: 24px; color:green;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
-          actionButton("ask_new_question", "Next Question", icon = icon("forward", style = "padding-right: 4px;"), style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;opacity:0.5;color:black;")))
+          actionButton("ask_new_question", "Next Question", icon = icon("forward", style = "padding-right: 4px;"), style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;opacity:0.5;color:black;"))
+          ),
+      div(icon("flag-checkered", style = paste0("display: ", show_completion_flag$status, "; white: green; margin-right:5px;font-size: 16px;")), span('Test Complete!', style = paste0("display: ", show_completion_flag$status, "; color: white; margin-top:35px;font-size: 16px;")))
     )
   })
   
