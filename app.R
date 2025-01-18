@@ -27,7 +27,7 @@ ui <- fluidPage(
     
     mainPanel(
       uiOutput("area_tag"),
-      div(id = "animated-text", "", style = 'margin-left:25px;'),
+      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;'),
       uiOutput("show_answer_btn"),
       div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;')
     )
@@ -36,7 +36,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 2
+  test_num_of_questions <- 10
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   show_ask_next_button <- reactiveValues(status='none')
@@ -126,7 +126,7 @@ server <- function(input, output, session) {
   })
   
   output$show_answer_btn <- renderUI({
-    actionButton("show_answer", "Show Answer", icon = icon("eye", style = "padding-right: 5px;"), style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;"))
+    actionButton("show_answer", "Show Answer", icon = icon("eye", style = "padding-right: 5px;"), style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;margin-right:25px;"))
   })
   
   output$answer <- renderUI({
