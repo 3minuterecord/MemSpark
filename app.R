@@ -26,7 +26,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       uiOutput("topic_selector"),
-      div(actionButton("new_question", "New Test", icon = icon("rocket", style = "padding-right: 5px;")),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
+      div(actionButton("new_test", "New Test", icon = icon("rocket", style = "padding-right: 5px;")),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
       uiOutput("progress_bar")
     ),
     
@@ -53,7 +53,9 @@ server <- function(input, output, session) {
   num_questions_asked <- reactiveValues(num=0)
   question_counter <- reactiveValues(val=0)
   quiz_score <- reactiveValues(val=0)
+  score_record <- reactiveValues(vals=c())
   question_nums <- reactiveValues(selected=NA)
+  progress <- reactiveValues(done=0)
   
   quiz_data <- reactive({
     data <- suppressWarnings(read.csv("data/knowledgebase.csv", stringsAsFactors = FALSE))
@@ -65,18 +67,21 @@ server <- function(input, output, session) {
     div(selectInput("num", "Select Topic:", choices = c("Mix", sort(unique(quiz_data()$area)))))
   })
   
-  
-  observe({
+  observeEvent(input$new_test, {
+    show_completion_flag$status <- 'none'
+    show_ans_icon$status <- 'none'
+    question_counter$val <- 0
+    quiz_score$val <- 0
+    num_questions_asked$num <- 0
+    progress$done <- 0
+    
     data <- quiz_data()
     total_num_of_questions = length(data$question)
-    #set.seed(123)
+
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
     question_nums$selected <- random_numbers
     if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
-  })
-  
-  observeEvent(input$new_question, {
-    data <- quiz_data()
+    
     question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
     show_ask_next_button$status <- 'none'
@@ -114,8 +119,12 @@ server <- function(input, output, session) {
     show_buttons$status <- 'none'
     quiz_score$val <- quiz_score$val + 1
     num_questions_asked$num <- num_questions_asked$num + 1
+    
     if (num_questions_asked$num == test_num_of_questions){
       show_completion_flag$status <- 'inline-block'
+      score <- 100 * round(quiz_score$val / num_questions_asked$num, 2)
+      score_record$vals <- c(score_record$vals, score)
+      if (DEBUG){print(paste0("Score saved: ", paste(score_record$vals, collapse = ", ")))}
     } else {
       show_ask_next_button$status <- 'inline-block'  
     }
@@ -127,7 +136,15 @@ server <- function(input, output, session) {
     Sys.sleep(1)
     show_buttons$status <- 'none'
     num_questions_asked$num <- num_questions_asked$num + 1
-    show_ask_next_button$status <- 'inline-block'
+    
+    if (num_questions_asked$num == test_num_of_questions){
+      show_completion_flag$status <- 'inline-block'
+      score <- 100 * round(quiz_score$val / num_questions_asked$num, 2)
+      score_record$vals <- c(score_record$vals, score)
+      if (DEBUG){print(paste0("Score saved: ", score_record$vals))}
+    } else {
+      show_ask_next_button$status <- 'inline-block'  
+    }
   })
   
   output$show_answer_btn <- renderUI({
@@ -162,10 +179,10 @@ server <- function(input, output, session) {
   })
   
   output$progress_bar <- renderUI({
-    done = round(100 * (num_questions_asked$num / test_num_of_questions), 0)
-    left = 99 - done
+    progress$done = round(100 * (num_questions_asked$num / test_num_of_questions), 0)
+    left = 99 - progress$done
     div(
-      div(style = paste0("width:", done, "%; height:25px;display: inline-block; margin-top:10px; margin-right:0px;background-color: green;")),
+      div(style = paste0("width:", progress$done, "%; height:25px;display: inline-block; margin-top:10px; margin-right:0px;background-color: green;")),
       div(style = paste0("width:", left, "%; height:25px;display: inline-block; margin-top:10px; margin-left:-3px;background-color: lightgrey;opacity: 0.2;background: repeating-linear-gradient( -45deg, grey, darkgrey, 1px, gold 2px, #e5e5f7 7px );"))
     )
   })
