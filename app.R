@@ -14,7 +14,12 @@ ui <- fluidPage(
     tagList(
       icon("lightbulb", style = "color:white;margin-left:15px;margin-top:15px;"), 
       span("MemSpark", style = "color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
-      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;"),
+      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;margin-right:10px;"),
+      span("100", class = "score-bubble-100"),
+      span("87", class = "score-bubble"),
+      span("92", class = "score-bubble"),
+      span("75", class = "score-bubble"),
+      span("68", class = "score-bubble"),
       div("Sharpen, Spark, Succeed.", style = "color:gold;margin-left:15px;margin-top:10px;font-size: 14px;font-weight: 200;")
     ), windowTitle = "Quiz Me"
   )),
