@@ -57,6 +57,7 @@ server <- function(input, output, session) {
   score_record <- reactiveValues(vals=c())
   question_nums <- reactiveValues(selected=NA)
   progress <- reactiveValues(done=0)
+  quiz_data_latest <- reactiveValues()
   
   quiz_data <- reactive({
     data <- suppressWarnings(read.csv("data/knowledgebase.csv", stringsAsFactors = FALSE))
@@ -69,21 +70,25 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$new_test, {
+    if (DEBUG) {print('-------- NEW TEST!')}
     show_completion_flag$status <- 'none'
     show_ans_icon$status <- 'none'
     question_counter$val <- 0
     quiz_score$val <- 0
     num_questions_asked$num <- 0
     progress$done <- 0
-    
-    data <- quiz_data()
-    total_num_of_questions = length(data$question)
+    next_question$num <- 1
+
+    data <- suppressWarnings(read.csv("data/knowledgebase.csv", stringsAsFactors = FALSE))
+    shuffled_data <- data[sample(nrow(data)), ]
+    quiz_data_latest$data <- shuffled_data
+    total_num_of_questions = length(shuffled_data$question)
 
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
     question_nums$selected <- random_numbers
     if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
     
-    question <- data$question[question_nums$selected[next_question$num]]
+    question <- quiz_data_latest$data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
     show_ask_next_button$status <- 'none'
     show_tags$status <- 'inline-block'
@@ -92,7 +97,9 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$ask_new_question, {
-    question <- quiz_data()$question[question_nums$selected[next_question$num]]
+    data <- quiz_data_latest$data
+    if (DEBUG){print(paste0('Asking question for row: ', question_nums$selected[next_question$num]))}
+    question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
     show_buttons$status <- 'none'
     show_tags$status <- 'inline-block'
@@ -104,7 +111,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$show_answer, {
     session$sendCustomMessage("hideAnsAsk", list())
-    data <- quiz_data()
+    data <- quiz_data_latest$data
     latest_answer$ans <- data$answer[question_nums$selected[next_question$num]]
     show_ans_button$status <- 'none !important'
     show_buttons$status <- 'inline-block'
@@ -292,9 +299,9 @@ server <- function(input, output, session) {
   })
   
   output$area_tag <- renderUI({
-    out_area <- quiz_data()$area[question_nums$selected[question_counter$val]]
-    out_topic <- quiz_data()$topic[question_nums$selected[question_counter$val]]
-    out_subtopic <- quiz_data()$subtopic[question_nums$selected[question_counter$val]]
+    out_area <- quiz_data_latest$data$area[question_nums$selected[question_counter$val]]
+    out_topic <- quiz_data_latest$data$topic[question_nums$selected[question_counter$val]]
+    out_subtopic <- quiz_data_latest$data$subtopic[question_nums$selected[question_counter$val]]
     div(
       div(out_area, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                                 margin-left:25px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
