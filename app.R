@@ -15,11 +15,12 @@ ui <- fluidPage(
       icon("lightbulb", style = "color:white;margin-left:15px;margin-top:15px;"), 
       span("MemSpark", style = "color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
       span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;margin-right:20px;"),
-      span("100", class = "score-bubble-100"),
-      span("87", class = "score-bubble"),
-      span("92", class = "score-bubble"),
-      span("75", class = "score-bubble"),
-      span("68", class = "score-bubble"),
+      span(uiOutput("score_bub_1"), style = 'display: inline-block'), 
+      span(uiOutput("score_bub_2"), style = 'display: inline-block'), 
+      span(uiOutput("score_bub_3"), style = 'display: inline-block'), 
+      span(uiOutput("score_bub_4"), style = 'display: inline-block'), 
+      span(uiOutput("score_bub_5"), style = 'display: inline-block'), 
+      span(uiOutput("score_bub_avg"), style = 'display: inline-block'), 
       div("Sharpen, Spark, Succeed.", style = "color:gold;margin-left:15px;margin-top:10px;font-size: 14px;font-weight: 200;")
     ), windowTitle = "Quiz Me"
   )),
@@ -185,6 +186,109 @@ server <- function(input, output, session) {
       div(style = paste0("width:", progress$done, "%; height:25px;display: inline-block; margin-top:10px; margin-right:0px;background-color: green;")),
       div(style = paste0("width:", left, "%; height:25px;display: inline-block; margin-top:10px; margin-left:-3px;background-color: lightgrey;opacity: 0.2;background: repeating-linear-gradient( -45deg, grey, darkgrey, 1px, gold 2px, #e5e5f7 7px );"))
     )
+  })
+  
+  output$score_bub_1 <- renderUI({
+    i = 1
+    if(length(score_record$vals) == (i - 1)){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (score_record$vals[i] == 100) {
+      score = 100
+      bub_class = 'score-bubble-100'
+    } else {
+      score = score_record$vals[i]
+      bub_class = 'score-bubble'
+    }
+    return(span(score, class = bub_class))
+  })
+  
+  output$score_bub_2 <- renderUI({
+    i = 2
+    if (length(score_record$vals) == 0){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (length(score_record$vals) < i){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (score_record$vals[i] == 100) {
+      score = 100
+      bub_class = 'score-bubble-100'
+    } else {
+      score = score_record$vals[i]
+      bub_class = 'score-bubble'
+    }
+    return(span(score, class = bub_class))
+  })
+  
+  output$score_bub_3 <- renderUI({
+    i = 3
+    print(length(score_record$vals))
+    if (length(score_record$vals) == 0){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (length(score_record$vals) < i){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (score_record$vals[i] == 100) {
+      score = 100
+      bub_class = 'score-bubble-100'
+    } else {
+      score = score_record$vals[i]
+      bub_class = 'score-bubble'
+    }
+    return(span(score, class = bub_class))
+  })
+  
+  output$score_bub_4 <- renderUI({
+    i = 4
+    if (length(score_record$vals) == 0){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (length(score_record$vals) < i){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (score_record$vals[i] == 100) {
+      score = 100
+      bub_class = 'score-bubble-100'
+    } else {
+      score = score_record$vals[i]
+      bub_class = 'score-bubble'
+    }
+    return(span(score, class = bub_class))
+  })
+  
+  output$score_bub_5 <- renderUI({
+    i = 5
+    if (length(score_record$vals) == 0){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (length(score_record$vals) < i){
+      score = '?'
+      bub_class = 'score-bubble-tbc'
+    } else if (score_record$vals[i] == 100) {
+      score = 100
+      bub_class = 'score-bubble-100'
+    } else {
+      score = score_record$vals[i]
+      bub_class = 'score-bubble'
+    }
+    return(span(score, class = bub_class))
+  })
+  
+  output$score_bub_avg <- renderUI({
+    if (length(score_record$vals) == 0){
+      score = '?'
+      bub_class = 'score-bubble-tbc bubble-avg'
+    } else {
+      score = round(mean(score_record$vals), 0)
+      if (score == 100){
+        bub_class = 'score-bubble-100 bubble-avg'
+      } else {
+        bub_class = 'score-bubble bubble-avg'  
+      }
+    }
+    return(span(score, class = bub_class))
   })
   
   output$area_tag <- renderUI({

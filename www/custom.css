@@ -48,6 +48,28 @@
   -webkit-border-radius:50%;
 }
 
+.score-bubble-tbc{
+  font-size: 12px;
+  padding:10px;
+  padding-left:14px;
+  padding-right:14px;
+  color:grey;
+  font-family: Tahoma, 
+  sans-serif;
+  font-weight: 800;
+  margin-left:0px;
+  vertical-align: middle;
+  border:1px solid white;    
+  border-radius:50%;
+  -moz-border-radius:50%;
+  -webkit-border-radius:50%;
+}
+
+.bubble-avg{
+  color:black;
+  opacity:0.8;
+  background-color: gold;
+
 .number-circle {
     border-radius: 50%;
     width: 36px;
