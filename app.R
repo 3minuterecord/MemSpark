@@ -14,7 +14,7 @@ ui <- fluidPage(
     tagList(
       icon("lightbulb", style = "color:white;margin-left:15px;margin-top:15px;"), 
       span("MemSpark", style = "color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
-      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;margin-right:10px;"),
+      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;margin-right:20px;"),
       span("100", class = "score-bubble-100"),
       span("87", class = "score-bubble"),
       span("92", class = "score-bubble"),
@@ -41,7 +41,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 10
+  test_num_of_questions <- 3
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   show_ask_next_button <- reactiveValues(status='none')
@@ -79,18 +79,18 @@ server <- function(input, output, session) {
     data <- quiz_data()
     question <- data$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
-    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_ask_next_button$status <- 'none'
     show_tags$status <- 'inline-block'
+    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     question_counter$val <- question_counter$val + 1
   })
   
   observeEvent(input$ask_new_question, {
     question <- quiz_data()$question[question_nums$selected[next_question$num]]
     latest_answer$ans <- '' 
-    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_buttons$status <- 'none'
     show_tags$status <- 'inline-block'
+    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
     show_ask_next_button$status <- 'none'
     show_ans_icon$status <- 'none'
     question_counter$val <- question_counter$val + 1
@@ -177,13 +177,13 @@ server <- function(input, output, session) {
     div(
       div(out_area, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                                 margin-left:25px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
-                                opacity: 0.4;border-radius:4px;")),
+                                opacity: 0.4;border-radius:4px;animation: fadeIn 1s;")),
       div(out_topic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                               margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:silver;
-                              opacity: 0.45;border-radius:4px;")),
+                              opacity: 0.45;border-radius:4px;animation: fadeIn 1s")),
       div(out_subtopic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                               margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:olive;
-                              opacity: 0.8;border-radius:4px;"))
+                              opacity: 0.8;border-radius:4px;animation: fadeIn 1s"))
     )
   })
 
@@ -198,7 +198,6 @@ Shiny.addCustomMessageHandler('animateText', function(data) {
   let i = 0;
 
   answerBtn.style.display = 'none'; // Hide the button during animation
-  
   function typeWriter() {
     if (i < text.length) {
       textDiv.textContent += text.charAt(i);
