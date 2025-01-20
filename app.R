@@ -42,7 +42,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 3
+  test_num_of_questions <- 5
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   show_ask_next_button <- reactiveValues(status='none')
