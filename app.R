@@ -358,7 +358,7 @@ Shiny.addCustomMessageHandler('showClapping', function(data) {
   const sadIcon = document.getElementById('clap_icon');
   sadIcon.style.display = 'inline-block'; // Show the icon
   setTimeout(() => {
-    sadIcon.style.display = 'none'; // Hide the icon after 2 seconds
+    sadIcon.style.display = 'none'; // Hide the icon after 4 seconds
   }, 4000);
 });
 
