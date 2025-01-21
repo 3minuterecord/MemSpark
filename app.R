@@ -33,9 +33,9 @@ ui <- fluidPage(
     
     mainPanel(
       uiOutput("area_tag"),
-      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;'),
+      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:700px;'),
       uiOutput("show_answer_btn"),
-      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;')
+      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:700px;')
     )
   )
 )
@@ -66,7 +66,7 @@ server <- function(input, output, session) {
   })
   
   output$topic_selector <- renderUI({
-    div(selectInput("num", "Select Topic:", choices = c("Mix", sort(unique(quiz_data()$area)))))
+    div(id='topic_select', selectizeInput("num", "Select Topic:", choices = c("Mix", sort(unique(quiz_data()$area)))))
   })
   
   observeEvent(input$new_test, {

@@ -69,19 +69,6 @@
   color:black;
   opacity:0.8;
   background-color: gold;
-
-.number-circle {
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    padding: 8px;
-
-    background: #fff;
-    border: 2px solid #666;
-    color: #666;
-    text-align: center;
-
-    font: 12px Arial, sans-serif;
 }
 
 .tag-tile {
@@ -98,18 +85,6 @@
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
 }
 
-.select { 
-  max-width: 400px;
-}
-
-.span4 { 
-  max-width: 400px; 
-}
-
-.well { 
-  max-width: 400px; 
-}
-
 .selectize-input {
   font-size: 14px !important;
   // z-index: 1002 !important; 
@@ -117,8 +92,8 @@
 }
 
 .selectize-input.focus {
-  border-color:  grey !important;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px grey !important;
+  border-color:  #007068 !important;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px #007068 !important;
 }
 
 .selectize-dropdown {
@@ -129,8 +104,24 @@
 } 
 
 .selectize-dropdown .selected {
-  background-color: grey !important; 
+  background-color: black !important; 
 } 
+
+.drilling-action-btn {
+  width:225px; 
+  margin-top: 10px;
+  margin-right: 15px;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.left-input {
+  margin-left: 25px !important;
+}
+
+.dropdown-menu{
+  z-index: 2500;
+}
 
 @keyframes fadeIn {
   100% { opacity: 0.8; }
