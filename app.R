@@ -33,16 +33,16 @@ ui <- fluidPage(
     
     mainPanel(
       uiOutput("area_tag"),
-      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:500px;'),
+      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:550px;'),
       uiOutput("show_answer_btn"),
-      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:500px;')
+      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:550px;')
     )
   )
 )
 
 server <- function(input, output, session) {
   DEBUG <- FALSE
-  test_num_of_questions <- 5
+  test_num_of_questions <- 3
   latest_answer <- reactiveValues(ans='')
   show_buttons <- reactiveValues(status='none')
   show_ask_next_button <- reactiveValues(status='none')
@@ -84,6 +84,33 @@ server <- function(input, output, session) {
     quiz_data_latest$data <- shuffled_data
     total_num_of_questions = length(shuffled_data$question)
 
+    random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
+    question_nums$selected <- random_numbers
+    if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
+    
+    question <- quiz_data_latest$data$question[question_nums$selected[next_question$num]]
+    latest_answer$ans <- '' 
+    show_ask_next_button$status <- 'none'
+    show_tags$status <- 'inline-block'
+    session$sendCustomMessage("animateText", list(text = question, speed = 30)) 
+    question_counter$val <- question_counter$val + 1
+  })
+
+  observeEvent(input$go_again, {
+    if (DEBUG) {print('-------- NEW TEST!')}
+    show_completion_flag$status <- 'none'
+    show_ans_icon$status <- 'none'
+    question_counter$val <- 0
+    quiz_score$val <- 0
+    num_questions_asked$num <- 0
+    progress$done <- 0
+    next_question$num <- 1
+    
+    data <- suppressWarnings(read.csv("data/knowledgebase.csv", stringsAsFactors = FALSE))
+    shuffled_data <- data[sample(nrow(data)), ]
+    quiz_data_latest$data <- shuffled_data
+    total_num_of_questions = length(shuffled_data$question)
+    
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
     question_nums$selected <- random_numbers
     if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
@@ -168,7 +195,8 @@ server <- function(input, output, session) {
           #div(id = "clap_icon", icon("hands-clapping", style = "font-size: 24px; color:green;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
           actionButton("ask_new_question", "Next Question", icon = icon("forward", style = "padding-right: 4px;"), style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;opacity:0.5;color:black;"))
           ),
-      div(icon("flag-checkered", style = paste0("display: ", show_completion_flag$status, "; white: green; margin-right:5px;font-size: 16px;")), span('Test Complete!', style = paste0("display: ", show_completion_flag$status, "; color: white; margin-top:35px;font-size: 16px;")))
+      div(icon("flag-checkered", style = paste0("display: ", show_completion_flag$status, "; white: green; margin-right:5px;font-size: 16px;")), span('Test Complete!', style = paste0("display: ", show_completion_flag$status, "; color: white; margin-top:35px;font-size: 16px;"))),
+      div(actionButton("go_again", "Try Again?", icon = icon("rocket", style = "padding-right: 4px;"), style = paste0("display: ", show_completion_flag$status, "; margin-left:0px;margin-top:50px;background-color:green;opacity:0.5;color:black;")))
     )
   })
   
