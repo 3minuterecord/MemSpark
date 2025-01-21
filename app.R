@@ -33,9 +33,9 @@ ui <- fluidPage(
     
     mainPanel(
       uiOutput("area_tag"),
-      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:700px;'),
+      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:500px;'),
       uiOutput("show_answer_btn"),
-      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:700px;')
+      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:500px;')
     )
   )
 )
@@ -230,7 +230,6 @@ server <- function(input, output, session) {
   
   output$score_bub_3 <- renderUI({
     i = 3
-    print(length(score_record$vals))
     if (length(score_record$vals) == 0){
       score = '?'
       bub_class = 'score-bubble-tbc'
