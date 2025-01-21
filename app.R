@@ -122,8 +122,6 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$show_yes, {
-    session$sendCustomMessage("showClapping", list())
-    Sys.sleep(1)
     show_buttons$status <- 'none'
     quiz_score$val <- quiz_score$val + 1
     num_questions_asked$num <- num_questions_asked$num + 1
@@ -134,14 +132,14 @@ server <- function(input, output, session) {
       score_record$vals <- c(score_record$vals, score)
       if (DEBUG){print(paste0("Score saved: ", paste(score_record$vals, collapse = ", ")))}
     } else {
-      show_ask_next_button$status <- 'inline-block'  
+      show_ask_next_button$status <- 'inline-block'
+      #session$sendCustomMessage("showClapping", list())
+      #Sys.sleep(1)
     }
     
   })
   
   observeEvent(input$show_no, {
-    session$sendCustomMessage("showSadFace", list())
-    Sys.sleep(1)
     show_buttons$status <- 'none'
     num_questions_asked$num <- num_questions_asked$num + 1
     
@@ -151,7 +149,9 @@ server <- function(input, output, session) {
       score_record$vals <- c(score_record$vals, score)
       if (DEBUG){print(paste0("Score saved: ", score_record$vals))}
     } else {
-      show_ask_next_button$status <- 'inline-block'  
+      show_ask_next_button$status <- 'inline-block' 
+      #session$sendCustomMessage("showSadFace", list())
+      #Sys.sleep(1)
     }
   })
   
@@ -164,8 +164,8 @@ server <- function(input, output, session) {
       div(icon("check-circle", style = paste0("display: ", show_ans_icon$status, "; color: green; margin-right:5px;")), latest_answer$ans),
       div(actionButton("show_yes", "Correct", icon = icon("circle-check", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:0px;margin-top:25px;")), 
           actionButton("show_no", "Wrong", icon = icon("circle-xmark", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
-          div(id = "sad_icon", icon("sad-cry", style = "font-size: 24px; color:red;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
-          div(id = "clap_icon", icon("hands-clapping", style = "font-size: 24px; color:green;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
+          #div(id = "sad_icon", icon("sad-cry", style = "font-size: 24px; color:red;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
+          #div(id = "clap_icon", icon("hands-clapping", style = "font-size: 24px; color:green;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
           actionButton("ask_new_question", "Next Question", icon = icon("forward", style = "padding-right: 4px;"), style = paste0("display: ", show_ask_next_button$status, "; margin-left:0px;margin-top:25px;background-color: gold;opacity:0.5;color:black;"))
           ),
       div(icon("flag-checkered", style = paste0("display: ", show_completion_flag$status, "; white: green; margin-right:5px;font-size: 16px;")), span('Test Complete!', style = paste0("display: ", show_completion_flag$status, "; color: white; margin-top:35px;font-size: 16px;")))
