@@ -2,40 +2,50 @@ library(shiny)
 library(shinythemes)
 library(dplyr)
 library(shinyjs)
+library(shinyWidgets)
 
 ui <- fluidPage(
   useShinyjs(),
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+    tags$link(rel = "stylesheet", type = "text/css", href = "custom.css"),
+    tags$script(HTML("
+      Shiny.setInputValue('plus_clicked', 0, {priority: 'event'});
+      function clickPlus() {
+        Shiny.setInputValue('plus_clicked', {priority: 'event'});
+      }
+    "))
   ),
   tags$style(rel = "stylesheet", type = "text/css", href = "custom.css"),
   theme = shinytheme("cyborg"),
   div(titlePanel(
     tagList(
-      icon("lightbulb", style = "color:white;margin-left:15px;margin-top:15px;"), 
-      span("MemSpark", style = "color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
-      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-10px;margin-right:20px;"),
-      span(uiOutput("score_bub_1"), style = 'display: inline-block'), 
-      span(uiOutput("score_bub_2"), style = 'display: inline-block'), 
-      span(uiOutput("score_bub_3"), style = 'display: inline-block'), 
-      span(uiOutput("score_bub_4"), style = 'display: inline-block'), 
-      span(uiOutput("score_bub_5"), style = 'display: inline-block'), 
-      span(uiOutput("score_bub_avg"), style = 'display: inline-block'), 
-      div("Sharpen, Spark, Succeed.", style = "color:gold;margin-left:15px;margin-top:10px;font-size: 14px;font-weight: 200;")
+      icon("lightbulb", style = "font-size: 38px;color:white;margin-left:20px;margin-top:15px;"), 
+      span("MemSpark", style = "font-size: 40px;color:white;font-family: Tahoma, sans-serif;font-weight: 600;"),
+      span("+", style = "color:gold;font-family: Tahoma, sans-serif;font-weight: 600;margin-left:-5x;margin-right:0px;cursor: pointer; animation: pulse 0.5s 2;", onclick = "clickPlus()"),
+      # span(actionButton("new_test", "", size = 'sm', status = "default", icon = icon("rocket"))), 
+      # uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;"))
+      div("Sharpen, Spark, Succeed.", style = "color:gold;margin-left:20px;margin-top:6px;margin-bottom:10px;font-size: 14px;font-weight: 200;"),
+      div(
+        span(uiOutput("score_bub_1"), style = 'display: inline-block; margin-left:20px'), 
+        span(uiOutput("score_bub_2"), style = 'display: inline-block; margin-left:2px'), 
+        span(uiOutput("score_bub_3"), style = 'display: inline-block; margin-left:2px'), 
+        span(uiOutput("score_bub_4"), style = 'display: inline-block; margin-left:2px'), 
+        span(uiOutput("score_bub_5"), style = 'display: inline-block; margin-left:2px'), 
+        span(uiOutput("score_bub_avg"), style = 'display: inline-block; margin-left:2px')
+      )
     ), windowTitle = "Quiz Me"
   )),
   sidebarLayout(
     sidebarPanel(
-      uiOutput("topic_selector"),
-      div(actionButton("new_test", "New Test", icon = icon("rocket", style = "padding-right: 5px;")),  uiOutput('display_score', style = "display: inline-block; margin-left:10px;vertical-align: middle; color: white;font-size: 22px;font-weight: 800;")),
-      uiOutput("progress_bar")
+      uiOutput("area_tag"),
+      div(id = "animated-text", "", style = 'font-size: 16px;margin-left:0px;margin-right:25px;max-width:550px;'),
+      uiOutput("show_answer_btn"),
+      div(uiOutput("answer"), style = 'margin-left:0px;margin-top:10px;max-width:550px;')
     ),
     
     mainPanel(
-      uiOutput("area_tag"),
-      div(id = "animated-text", "", style = 'margin-left:25px;margin-right:25px;max-width:550px;'),
-      uiOutput("show_answer_btn"),
-      div(uiOutput("answer"), style = 'margin-left:25px;margin-top:10px;max-width:550px;')
+      #uiOutput("topic_selector"),
+      #uiOutput("progress_bar")
     )
   )
 )
@@ -69,7 +79,7 @@ server <- function(input, output, session) {
     div(id='topic_select', selectizeInput("num", "Select Topic:", choices = c("Mix", sort(unique(quiz_data()$area)))))
   })
   
-  observeEvent(input$new_test, {
+  observeEvent(input$plus_clicked, {
     if (DEBUG) {print('-------- NEW TEST!')}
     show_completion_flag$status <- 'none'
     show_ans_icon$status <- 'none'
@@ -139,7 +149,24 @@ server <- function(input, output, session) {
   observeEvent(input$show_answer, {
     session$sendCustomMessage("hideAnsAsk", list())
     data <- quiz_data_latest$data
-    latest_answer$ans <- data$answer[question_nums$selected[next_question$num]]
+    
+    full_text <- data$answer[question_nums$selected[next_question$num]]
+    highlight_phrase <- data$highlight[question_nums$selected[next_question$num]]
+    
+    if (!is.null(highlight_phrase) && nzchar(trimws(highlight_phrase))) {
+      # Only run gsub if pattern is non-empty
+      highlighted_text <- gsub(
+        highlight_phrase,
+        paste0('<span style="background-color: rgba(255, 215, 0, 0.4); color: black;">', highlight_phrase, '</span>'),
+        full_text,
+        fixed = TRUE
+      )
+    } else {
+      # No highlight applied
+      highlighted_text <- full_text
+    }
+    
+    latest_answer$ans <- highlighted_text #data$answer[question_nums$selected[next_question$num]]
     show_ans_button$status <- 'none !important'
     show_buttons$status <- 'inline-block'
     show_ans_icon$status <- 'inline-block'
@@ -183,12 +210,12 @@ server <- function(input, output, session) {
   })
   
   output$show_answer_btn <- renderUI({
-    actionButton("show_answer", "Show Answer", icon = icon("eye", style = "padding-right: 5px;"), style = paste0("display: ", show_ans_button$status, "; margin-left:25px;margin-top:25px;margin-right:25px;"))
+    actionButton("show_answer", "Show Answer", icon = icon("eye", style = "padding-right: 5px;"), style = paste0("display: ", show_ans_button$status, "; margin-left:0px;margin-top:25px;margin-right:25px;"))
   })
   
   output$answer <- renderUI({
     div(
-      div(icon("check-circle", style = paste0("display: ", show_ans_icon$status, "; color: green; margin-right:5px;")), latest_answer$ans),
+      div(icon("check-circle", style = paste0("display: ", show_ans_icon$status, "; color: green; margin-right:5px;")), HTML(latest_answer$ans)),
       div(actionButton("show_yes", "Correct", icon = icon("circle-check", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:0px;margin-top:25px;")), 
           actionButton("show_no", "Wrong", icon = icon("circle-xmark", style = "padding-right: 3px;"), style = paste0("display: ", show_buttons$status, "; margin-left:10px;margin-top:25px;")),
           #div(id = "sad_icon", icon("sad-cry", style = "font-size: 24px; color:red;animation: pulse 0.5s linear infinite;"), style = "display: none;margin-left:9px;vertical-align:bottom;margin-bottom:5px;"),
@@ -331,7 +358,7 @@ server <- function(input, output, session) {
     out_subtopic <- quiz_data_latest$data$subtopic[question_nums$selected[question_counter$val]]
     div(
       div(out_area, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
-                                margin-left:25px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
+                                margin-left:0px;color:black;margin-top:5px;margin-bottom:15px;background-color:gold;
                                 opacity: 0.60;border-radius:4px;")),
       div(out_topic, style= paste0("display: ", show_tags$status, "; padding:5px;padding-right:8px;padding-left:8px;
                               margin-left:5px;color:black;margin-top:5px;margin-bottom:15px;background-color:silver;
