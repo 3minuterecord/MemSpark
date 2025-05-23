@@ -95,6 +95,7 @@ server <- function(input, output, session) {
     total_num_of_questions = length(shuffled_data$question)
 
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
+    print(random_numbers)
     question_nums$selected <- random_numbers
     if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
     
@@ -122,6 +123,7 @@ server <- function(input, output, session) {
     total_num_of_questions = length(shuffled_data$question)
     
     random_numbers <- sample(1:total_num_of_questions, test_num_of_questions, replace = FALSE)
+    print(random_numbers)
     question_nums$selected <- random_numbers
     if (DEBUG){print(paste0("Randomly selected questions: ", paste(random_numbers, collapse = ", ")))}
     
